@@ -4,9 +4,15 @@
   <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
   <script src="https://kit.fontawesome.com/48e2953c42.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets\css\style.css">
-  <title>Document</title>
+  <title>HACKATHON</title>
 </head>
 <body>
+  <button class="makeMap">Click</button>
+  <div id="new-map"></div>
+  <form action="/action_page.php">
+    Enter keyword: <input type="text" name="fname" class="keyword-input"><br>
+  </form>
+  <button class="TM" onclick="getData">Click for TM results</button>
   <div id="app-container">
     <div id="app-header">
       <h1 id="title">Rained Out</h1>
@@ -31,6 +37,7 @@
 </body>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ"></script>
   <script src="assets\js\map.js"></script>
+  <script src="./assets/js/ticketmaster.js"></script>
   <script src="assets\js\test.js"></script>
   <script src="assets\js\main.js"></script>
 </html>
