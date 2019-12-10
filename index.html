@@ -2,15 +2,35 @@
 <html lang="en">
 <head>
   <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+  <script src="https://kit.fontawesome.com/48e2953c42.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets\css\style.css">
   <title>Document</title>
 </head>
 <body>
-  <button>Click</button>
-  <div id="new-map"></div>
+  <div id="app-container">
+    <div id="app-header">
+      <h1 id="title">Rained Out</h1>
+    </div>
+    <div id="search-bar">
+      <input type="text" id="search-input" placeholder="Enter Your Event">
+      <button id="search-button"><i class="fa fa-arrow-right fa-2x"></i></button>
+    </div>
+    <div id="search-result-container">
+      <div class="result ph-event-name">
+        <div class="event-info">
+          <div class="event-title">Some Event Title</div>
+          <div class="event-description">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tempore eaque nisi suscipit autem voluptatibus aspernatur iure modi voluptatum, consectetur id cupiditate, deserunt dicta quisquam doloribus rem perferendis eligendi similique numquam cumque. Ratione sequi explicabo voluptas odit voluptatum, veniam esse deserunt maxime ut dolor. Eius illum incidunt in fugiat.</div>
+        </div>
+        <div class="location-info">
+          <div class="weather-info"></div>
+          <div class="map-info"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ"></script>
-<script src="assets\js\map.js"></script>
-<script src="assets\js\test.js"></script>
-<script src="assets\js\main.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ"></script>
+  <script src="assets\js\map.js"></script>
+  <script src="assets\js\test.js"></script>
+  <script src="assets\js\main.js"></script>
 </html>
