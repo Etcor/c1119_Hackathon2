@@ -1,7 +1,7 @@
 $(document).ready(initApp);
 
 function initApp(){
- $('button').on('click', makeMap);
+ $('.makeMap').on('click', makeMap);
 }
 
 var parent = $('#new-map');
