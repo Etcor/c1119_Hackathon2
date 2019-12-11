@@ -8,8 +8,9 @@ var parent = $('.ph-event-name .map-info');
 var makinMaps = new Event_Map(33.634870, -117.740450, 'learning-fuze', parent, 16);
 
 var test = new Display_result({
-  searchButton: $('.makeMap')
+  searchButton: $('#search-button')
 });
+test.addEventHandlers();
 
 var parentElem = $(".ph-event-name .weather-info");
 var gettinWeather = new Event_Weather_Current(33.634870, -117.740450, parentElem);
