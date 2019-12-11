@@ -37,7 +37,7 @@ class Ticket_Master_Search {
       var pSeatingChart = $('.seatingChart');
       var eventName = ticketmasterResponse._embedded.events[index]['name'];
       var venueName = ticketmasterResponse._embedded.events[index]._embedded.venues[0]['name'];
-      var eventDate = ticketmasterResponse._embedded.events[index].dates.start['dateTime'];
+      var eventDate = ticketmasterResponse._embedded.events[index].dates.start['localDate'];
       var eventCity = ticketmasterResponse._embedded.events[index]._embedded.venues[0].city['name'];
       var eventState = ticketmasterResponse._embedded.events[index]._embedded.venues[0].state['name'];
       var eventAddress = ticketmasterResponse._embedded.events[index]._embedded.venues[0].address['line1'];
@@ -49,19 +49,42 @@ class Ticket_Master_Search {
       // var seatLink = seatingChartImg.link("seatingChartLink");
       // var priceRangeMin = ticketmasterResponse._embedded.events[index].priceRanges[0]['min'];
       // var priceRangeMax = ticketmasterResponse._embedded.events[index].priceRanges[0]['max'];
-      var eventStartTime = ticketmasterResponse._embedded.events[index].dates.start['localTime'];
-      // var eventStartTimeHours = eventStartTime.slice(0, 1);
-      // var EventStartTimeHoursMinusTwelve = eventStartTimeHours - 12;
-      // eventStartTime = EventStartTimeHoursMinusTwelve + eventStartTime;
+      var TwentyFourHourTime = ticketmasterResponse._embedded.events[index].dates.start['localTime'];
+      console.log("local time: ", TwentyFourHourTime);
+
+      var twentyFourHourTime = this.data[searchResultIndex].twentyFourHourTime
+      console.log("24h Time from ticketmaster: ", twentyFourHourTime);
+
+      var twelveHours = twentyFourHourTime.slice(0, 2);
+      console.log("first two digits from: ", twelveHours);
+      var minutesAndSeconds = twentyFourHourTime.slice(2);
+      console.log("hrs and mins: ", minutesAndSeconds)
+
+      if (twelveHours > 12) {
+        var hoursMinusTwelve = twelveHours - 12;
+        var PM = hoursMinusTwelve + " PM"
+        var fixedTime = hoursMinusTwelve + minutesAndSeconds + " PM"
+        $pTagTime = fixedTime;
+        console.log("fixed time: ", fixedTime);
+      } else if (twelveHours === '12') {
+        twentyFourHourTime += " PM"
+        $pTagTime = twentyFourHourTime
+        console.log("24 hr time: ", twentyFourHourTime);
+      } else {
+        twentyFourHourTime += " AM"
+        $pTagTime = twentyFourHourTime;
+        console.log("24 fixed hours: ", twentyFourHourTime)
+      }
+
       var latitude = ticketmasterResponse._embedded.events[index]._embedded.venues[0].location['latitude'];
       var longitude = ticketmasterResponse._embedded.events[index]._embedded.venues[0].location['longitude'];
       var eventInfo = ticketmasterResponse._embedded.events[index]['info'];
-      eventNameDiv.text(eventName);
-      pDate.text(eventDate);
-      pTime.text(eventStartTime);
-      pVenue.text(venueName);
-      pAddress.text(eventAddress);
-      pSeatingChart.text(seatingChartLink);
+      // eventNameDiv.text(eventName);
+      // pDate.text(eventDate);
+      // pTime.text(eventStartTime);
+      // pVenue.text(venueName);
+      // pAddress.text(eventAddress);
+      // pSeatingChart.text(seatingChartLink);
     }
   }
 

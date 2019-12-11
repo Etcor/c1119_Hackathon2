@@ -75,22 +75,26 @@ class Display_result {
       this.handleBadKeyword();
       return;
     }
+    console.log("OBJECT: ", response);
     var responseTarget = response._embedded.events;
     for(var searchResultIndex in responseTarget){
       this.data[searchResultIndex] = {
         eventName: responseTarget[searchResultIndex]['name'],
         venueName: responseTarget[searchResultIndex]._embedded.venues[0]['name'],
-        eventDate: responseTarget[searchResultIndex].dates.start['dateTime'],
+        eventDate: responseTarget[searchResultIndex].dates.start['localDate'],
         eventCity: responseTarget[searchResultIndex]._embedded.venues[0].city['name'],
         // eventState: responseTarget[searchResultIndex]._embedded.venues[0].state['name'],
         eventAddress: responseTarget[searchResultIndex]._embedded.venues[0].address['line1'],
         eventCountry: responseTarget[searchResultIndex]._embedded.venues[0].country['countryCode'],
-        // seatingChartLink: responseTarget[searchResultIndex].seatmap['staticUrl'],
+        seatingChartLink: responseTarget[searchResultIndex].seatmap['staticUrl'],
         eventStartTime: responseTarget[searchResultIndex].dates.start['localTime'],
-        eventInfo: responseTarget[searchResultIndex]['info']
+        eventInfo: responseTarget[searchResultIndex]['info'],
+        ticketLink: responseTarget[searchResultIndex]['url'],
+        twentyFourHourTime: responseTarget[searchResultIndex].dates.start['localTime']
       };
       var address = this.getAddressForGeolocation(searchResultIndex);
       this.getLocationData(address, searchResultIndex);
+
     }
   }
 
@@ -210,19 +214,33 @@ class Display_result {
   }
 
   render(index) {
+
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
     $locationInfo.append($weatherInfo, $mapInfo);
+    var $pTagVenue = $('<p>').text(this.data[index].venueName);
+    var $pTagDate = $('<p>').text(this.data[index].eventDate);
+    var $pTagTime = $('<p>').text(this.data[index].eventStartTime);
 
-    var $eventTitle = $('<div>').addClass('event-title');
+    // var $pTagAddress = $('<p>').text(this.data[index].eventAddress);
+    var $aTagSeatingChart = $('<a>').text('Click For Seating Chart!').attr({
+      href: this.data[index].seatingChartLink,
+      target: '_blank'
+    })
+    var $aTagTicketLink = $('<a>').text('Buy Tickets Now!').attr({
+      href: this.data[index].ticketLink,
+      target: '_blank'
+    })
+    var $eventTitle = $('<div>').addClass('event-title').text(this.data[index].eventName);
     var $eventDescription = $('<div>').addClass('event-description');
+    $eventDescription.append($pTagVenue, $pTagDate, $pTagTime, $aTagSeatingChart, $aTagTicketLink);
     var $eventInfo = $('<div>').addClass('event-info');
     $eventInfo.append($eventTitle, $eventDescription);
-
     var $eventResult = $('<div>').addClass('result ' + index);
     $eventResult.append($eventInfo, $locationInfo);
-
     this.elementConfig.searchContainer.append($eventResult);
+
+
   }
 }
