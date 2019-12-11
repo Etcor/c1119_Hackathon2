@@ -27,11 +27,13 @@ function getCurrentWeatherDataFromServer() {
 function processGetServerWeatherData(response) {
   console.log(response);
   gettinWeather.render();
+  var currentLocationName = response.name;
   var currentTemp = response.main.temp;
   var currentTempFahr = (currentTemp * (9/5) - 459.67).toFixed(0);
   var currentWeatherIcon = response.weather[0].icon + "@2x.png";
   var currentWeatherDescription = response.weather[0].description;
-  $(".temp-current").text(currentTempFahr);
+  $(".weather-location-name").text(currentLocationName);
+  $(".temp-current").text(currentTempFahr).append($("<span>").html("&#8457"));
   $(".icon-current").attr("src", "http://openweathermap.org/img/wn/"+currentWeatherIcon);
   $(".weather-description").text(currentWeatherDescription);
 }
