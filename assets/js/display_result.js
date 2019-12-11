@@ -19,11 +19,13 @@ class Display_result {
     this.processWeatherDataError = this.processWeatherDataError.bind(this);
     this.handleBadKeyword = this.handleBadKeyword.bind(this);
     this.clearInputField = this.clearInputField.bind(this);
+    this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
   }
 
   addEventHandlers() {
     this.elementConfig.searchButton.on('click', this.getSearchResult);
     this.elementConfig.searchInput.on('click', this.clearInputField);
+    this.elementConfig.searchInput.on('keypress', this.getSearchResultOnEnterKey);
   }
 
   getSearchResult() {
@@ -47,6 +49,12 @@ class Display_result {
     $.ajax(ajaxConfig);
   }
 
+  getSearchResultOnEnterKey(event) {
+    if (event.keyCode == 13) {
+      this.getSearchResult();
+    }
+  }
+
   handleBadKeyword() {
     this.elementConfig.searchInput.addClass('keyword-error');
     this.elementConfig.searchButton.addClass('btn-error');
@@ -58,7 +66,8 @@ class Display_result {
     this.elementConfig.searchInput.removeClass('keyword-error');
     this.elementConfig.searchButton.removeClass('btn-error');
     $('.fas').addClass('fa-arrow-right').removeClass('fa-times');
-    this.elementConfig.searchInput.val('').attr('placeholder', 'Enter Your Event');
+    this.elementConfig.searchInput.attr('placeholder', 'Enter Your Event');
+    this.elementConfig.searchInput.focus().select()
   }
 
   handleSuccessfulSearchResult(response) {
@@ -166,6 +175,34 @@ class Display_result {
     var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
     var currentWeatherIcon = response.weather[0].icon + "@2x.png";
     var currentWeatherDescription = response.weather[0].description;
+    if (currentTempFahr > 89) {
+      $(".weather-temp-"+index).parent().parent().addClass("hot-temp");
+    } else if (currentTempFahr < 55) {
+      $(".weather-temp-"+index).parent().parent().addClass("cold-temp");
+    }
+    // switch (currentWeatherDescription) {
+    //   case "clear sky":
+    //     return;
+    //   case "few clouds":
+    //     return;
+    //   case "scattered clouds":
+    //     return;
+    //   case "broken clouds":
+    //     return;
+    //   case "shower rain":
+    //     return;
+    //   case "rain":
+    //     return;
+    //   case "thunderstorm":
+    //     return;
+    //   case "snow":
+    //     return;
+    //   case "mist":
+    //     return;
+    //   default:
+    //     break;
+    // }
+
     $(".weather-title-"+index).text(currentLocationName);
     $(".weather-temp-"+index).text(currentTempFahr).append($("<span>").html("&#8457"));
     $(".weather-icon-"+index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
