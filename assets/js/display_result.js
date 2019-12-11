@@ -34,7 +34,9 @@ class Display_result {
       this.handleBadKeyword();
       return;
     }
-    this.elementConfig.searchContainer.empty();
+    $('.landing-page').addClass('hidden');
+    $('.result').remove();
+    $('.content-loading').removeClass('hidden');
     var ajaxConfig = {
       type: "GET",
       url: "https://app.ticketmaster.com/discovery/v2/events.json?size=3&apikey=RpWHpqTak6PwdixiLGSrrPsoBINm24CG",
@@ -240,7 +242,6 @@ class Display_result {
     var $eventResult = $('<div>').addClass('result ' + index);
     $eventResult.append($eventInfo, $locationInfo);
     this.elementConfig.searchContainer.append($eventResult);
-
-
+    $('.content-loading').addClass('hidden');
   }
 }
