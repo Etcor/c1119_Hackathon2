@@ -12,6 +12,9 @@ class Display_result {
     this.parseSuccessfulTicketMasterResponse = this.parseSuccessfulTicketMasterResponse.bind(this);
     this.handleTicketMasterError = this.handleTicketMasterError.bind(this);
     this.getAddressString = this.getAddressString.bind(this);
+    this.getCurrentWeatherDataFromServer = this.getCurrentWeatherDataFromServer.bind(this);
+    this.processGetServerWeatherData = this.processGetServerWeatherData.bind(this);
+    this.processGetServerError = this.processGetServerError.bind(this);
   }
 
   addEventHandlers() {
@@ -93,15 +96,48 @@ class Display_result {
     }
     this.data[index].coordinates = coordinates;
     this.render(index);
-    this.getMap(index);
+    this.getLocationInfo(index);
   }
 
-  getMap(index){
+  getCurrentWeatherDataFromServer(weather, index) {
+    var key = "ba298869db4c59aadd8bdebcb3a3e02c";
+    var ajaxConfigObject = {
+      dataType: 'json',
+      url: "http://api.openweathermap.org/data/2.5/weather?lat=" + weather.weatherData.lat + "&lon=" + weather.weatherData.lon + "&appid=" + key,
+      method: 'GET',
+      success: response => this.processGetServerWeatherData(response, weather, index),
+      error: this.processGetServerError
+    }
+    $.ajax(ajaxConfigObject);
+  }
+  processGetServerWeatherData(response, weather, index) {
+    console.log(response);
+    var currentLocationName = response.name;
+    var currentTemp = response.main.temp;
+    var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
+    var currentWeatherIcon = response.weather[0].icon + "@2x.png";
+    var currentWeatherDescription = response.weather[0].description;
+    $(".weather-title-"+index).text(currentLocationName);
+    $(".weather-temp-"+index).text(currentTempFahr).append($("<span>").html("&#8457"));
+    $(".weather-icon-"+index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
+    $(".weather-description-"+index).text(currentWeatherDescription);
+  }
+
+  processGetServerError(response) {
+    console.log(response);
+  }
+
+
+  getLocationInfo(index){
     var latitude = this.data[index].coordinates.lat;
     var longitude = this.data[index].coordinates.lng;
-    var parent = $('.' + index + ' .map-info');
-    var map = new Event_Map(latitude, longitude, index, parent, 16);
+    var mapParent = $('.' + index + ' .map-info');
+    var weatherParent = $('.' + index + ' .weather-info');
+    var map = new Event_Map(latitude, longitude, index, mapParent, 16);
+    var weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
     map.render();
+    weather.render();
+    this.getCurrentWeatherDataFromServer(weather, index);
   }
 
   render(index) {
