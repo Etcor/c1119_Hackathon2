@@ -30,3 +30,5 @@ if (twelveHours > 12) {
   twentyFourHourTime += " AM"
   // this.$pTagTime = twentyFourHourTime;
   console.log("24 fixed hours: ", twentyFourHourTime);
+
+  // banana
