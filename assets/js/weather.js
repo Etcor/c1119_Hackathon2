@@ -17,7 +17,7 @@ class Event_Weather_Current {
   }
 
   render() {
-    this.domElements.title = $("<h2>").addClass("weather-title");
+    this.domElements.title = $("<h2>").addClass("weather-title").text("Current Weather");
     this.domElements.tempIconContainer = $("<div>").addClass("temp-and-icon-current");
     this.domElements.temp = $("<div>").addClass("temp-current");
     this.domElements.icon = $("<img>").addClass("icon-current");
