@@ -27,6 +27,5 @@ class Event_Weather_Current {
     this.domElements.description = $("<h3>").addClass("weather-description weather-description-" + this.weatherData.index);
 
     this.parentElem.append(this.domElements.title, this.domElements.name, this.domElements.tempIconContainer.append(this.domElements.temp, this.domElements.icon), this.domElements.description);
-    // return this.parentElem;
   }
 }
