@@ -49,9 +49,9 @@ class Display_result {
         eventStartTime: responseTarget[index].dates.start['localTime'],
         eventInfo: responseTarget[index]['info']
       };
-      debugger;
       var address = this.getAddressString(index);
-      this.data[index].coordinates = this.getLocationData(address);
+      this.getLocationData(address, index);
+
     }
   }
 
@@ -73,12 +73,12 @@ class Display_result {
     console.log(error);
   }
 
-  getLocationData(address) {
+  getLocationData(address, index) {
     var ajaxConfigObject = {
       dataType: 'JSON',
       url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address + '&key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ',
       method: 'GET',
-      success: this.parseLocationData,
+      success: res => this.parseLocationData(res, index),
       error: function (response) {
         console.log(response);
       }
@@ -86,17 +86,25 @@ class Display_result {
     $.ajax(ajaxConfigObject);
   }
 
-  parseLocationData(response) {
+  parseLocationData(response, index) {
     var coordinates = {
       lat: response.results[0].geometry.location.lat,
       lng: response.results[0].geometry.location.lng
     }
-    console.log('latitude: ', response.results[0].geometry.location.lat);
-    console.log('longitude: ', response.results[0].geometry.location.lng);
-    return coordinates;
+    this.data[index].coordinates = coordinates;
+    this.render(index);
+    this.getMap(index);
   }
 
-  render() {
+  getMap(index){
+    var latitude = this.data[index].coordinates.lat;
+    var longitude = this.data[index].coordinates.lng;
+    var parent = $('.' + index + ' .map-info');
+    var map = new Event_Map(latitude, longitude, index, parent, 16);
+    map.render();
+  }
+
+  render(index) {
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
@@ -105,7 +113,7 @@ class Display_result {
     var $eventDescription = $('<div>').addClass('event-description');
     var $eventInfo = $('<div>').addClass('event-info');
     $eventInfo.append($eventTitle, $eventDescription);
-    var $eventResult = $('<div>').addClass('result ' + 'ph-event-name');
+    var $eventResult = $('<div>').addClass('result ' + index);
     $eventResult.append($eventInfo, $locationInfo);
     $('#search-result-container').append($eventResult);
   }
