@@ -153,7 +153,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #f1c40f;
+  text-shadow: #2d3436;
+  background: #f2d56d;
 }
 h1.weather-title {
     text-align: center;
@@ -175,6 +176,13 @@ h2.weather-location-name {
 h3.weather-description {
     text-align: center;
     font-size: 2rem;
+}
+.hot-temp {
+  background-color: rgba(252, 18, 10, 0.993);
+}
+.cold-temp {
+  background-color: rgba(75, 174, 244, 1);
+  text-shadow: 2px 2px #9bd9ea;
 }
 
   /**************/

@@ -171,6 +171,34 @@ class Display_result {
     var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
     var currentWeatherIcon = response.weather[0].icon + "@2x.png";
     var currentWeatherDescription = response.weather[0].description;
+    if (currentTempFahr > 89) {
+      $(".weather-temp-"+index).parent().parent().addClass("hot-temp");
+    } else if (currentTempFahr < 55) {
+      $(".weather-temp-"+index).parent().parent().addClass("cold-temp");
+    }
+    // switch (currentWeatherDescription) {
+    //   case "clear sky":
+    //     return;
+    //   case "few clouds":
+    //     return;
+    //   case "scattered clouds":
+    //     return;
+    //   case "broken clouds":
+    //     return;
+    //   case "shower rain":
+    //     return;
+    //   case "rain":
+    //     return;
+    //   case "thunderstorm":
+    //     return;
+    //   case "snow":
+    //     return;
+    //   case "mist":
+    //     return;
+    //   default:
+    //     break;
+    // }
+
     $(".weather-title-"+index).text(currentLocationName);
     $(".weather-temp-"+index).text(currentTempFahr).append($("<span>").html("&#8457"));
     $(".weather-icon-"+index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
