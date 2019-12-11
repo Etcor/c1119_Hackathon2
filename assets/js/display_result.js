@@ -3,26 +3,36 @@ class Display_result {
     this.data = {};
     this.elementConfig = {
       searchButton: $(elementConfig.searchButton),
+      searchInput: $(elementConfig.searchInput),
+      searchContainer: $(elementConfig.searchContainer)
     };
     this.currentEventAddress = null;
     this.render = this.render.bind(this);
     this.getLocationData = this.getLocationData.bind(this);
     this.parseLocationData = this.parseLocationData.bind(this);
-    this.getResultData = this.getResultData.bind(this);
-    this.parseSuccessfulTicketMasterResponse = this.parseSuccessfulTicketMasterResponse.bind(this);
-    this.handleTicketMasterError = this.handleTicketMasterError.bind(this);
-    this.getAddressString = this.getAddressString.bind(this);
-    this.getCurrentWeatherDataFromServer = this.getCurrentWeatherDataFromServer.bind(this);
-    this.processGetServerWeatherData = this.processGetServerWeatherData.bind(this);
-    this.processGetServerError = this.processGetServerError.bind(this);
+    this.getSearchResult = this.getSearchResult.bind(this);
+    this.handleSuccessfulSearchResult = this.handleSuccessfulSearchResult.bind(this);
+    this.handleSearchError = this.handleSearchError.bind(this);
+    this.getAddressForGeolocation = this.getAddressForGeolocation.bind(this);
+    this.getCurrentWeatherData = this.getCurrentWeatherData.bind(this);
+    this.processWeatherData = this.processWeatherData.bind(this);
+    this.processWeatherDataError = this.processWeatherDataError.bind(this);
+    this.handleBadKeyword = this.handleBadKeyword.bind(this);
+    this.clearInputField = this.clearInputField.bind(this);
   }
 
   addEventHandlers() {
-    this.elementConfig.searchButton.on('click', this.getResultData);
+    this.elementConfig.searchButton.on('click', this.getSearchResult);
+    this.elementConfig.searchInput.on('click', this.clearInputField);
   }
 
-  getResultData() {
-    var textInputField = $("#search-input").val();
+  getSearchResult() {
+    var textInputField = this.elementConfig.searchInput.val();
+    if(!textInputField){
+      this.handleBadKeyword();
+      return;
+    }
+    this.elementConfig.searchContainer.empty();
     var ajaxConfig = {
       type: "GET",
       url: "https://app.ticketmaster.com/discovery/v2/events.json?size=3&apikey=RpWHpqTak6PwdixiLGSrrPsoBINm24CG",
@@ -31,49 +41,71 @@ class Display_result {
       },
       async: true,
       dataType: "json",
-      success: this.parseSuccessfulTicketMasterResponse,
-      error: this.handleTicketMasterError
+      success: this.handleSuccessfulSearchResult,
+      error: this.handleSearchError
     }
     $.ajax(ajaxConfig);
   }
 
-  parseSuccessfulTicketMasterResponse(response) {
-    var responseTarget = response._embedded.events;
-    for(var index in responseTarget){
-      this.data[index] = {
-        eventName: responseTarget[index]['name'],
-        venueName: responseTarget[index]._embedded.venues[0]['name'],
-        eventDate: responseTarget[index].dates.start['dateTime'],
-        eventCity: responseTarget[index]._embedded.venues[0].city['name'],
-        eventState: responseTarget[index]._embedded.venues[0].state['name'],
-        eventAddress: responseTarget[index]._embedded.venues[0].address['line1'],
-        eventCountry: responseTarget[index]._embedded.venues[0].country['countryCode'],
-        seatingChartLink: responseTarget[index].seatmap['staticUrl'],
-        eventStartTime: responseTarget[index].dates.start['localTime'],
-        eventInfo: responseTarget[index]['info']
-      };
-      var address = this.getAddressString(index);
-      this.getLocationData(address, index);
+  handleBadKeyword() {
+    this.elementConfig.searchInput.addClass('keyword-error');
+    this.elementConfig.searchButton.addClass('btn-error');
+    $('.fas').removeClass('fa-arrow-right').addClass('fa-times');
+    this.elementConfig.searchInput.val('').attr('placeholder', 'Error: No events exist by that name');
+  }
 
+  clearInputField() {
+    this.elementConfig.searchInput.removeClass('keyword-error');
+    this.elementConfig.searchButton.removeClass('btn-error');
+    $('.fas').addClass('fa-arrow-right').removeClass('fa-times');
+    this.elementConfig.searchInput.val('').attr('placeholder', 'Enter Your Event');
+  }
+
+  handleSuccessfulSearchResult(response) {
+    if (!response._embedded) {
+      this.handleBadKeyword();
+      return;
+    }
+    var responseTarget = response._embedded.events;
+    for(var searchResultIndex in responseTarget){
+      this.data[searchResultIndex] = {
+        eventName: responseTarget[searchResultIndex]['name'],
+        venueName: responseTarget[searchResultIndex]._embedded.venues[0]['name'],
+        eventDate: responseTarget[searchResultIndex].dates.start['dateTime'],
+        eventCity: responseTarget[searchResultIndex]._embedded.venues[0].city['name'],
+        // eventState: responseTarget[searchResultIndex]._embedded.venues[0].state['name'],
+        eventAddress: responseTarget[searchResultIndex]._embedded.venues[0].address['line1'],
+        eventCountry: responseTarget[searchResultIndex]._embedded.venues[0].country['countryCode'],
+        // seatingChartLink: responseTarget[searchResultIndex].seatmap['staticUrl'],
+        eventStartTime: responseTarget[searchResultIndex].dates.start['localTime'],
+        eventInfo: responseTarget[searchResultIndex]['info']
+      };
+      var address = this.getAddressForGeolocation(searchResultIndex);
+      this.getLocationData(address, searchResultIndex);
     }
   }
 
-  getAddressString(index) {
+  handleSearchError(error) {
+    console.log(error);
+  }
+
+  getAddressForGeolocation(index) {
+    /*
+    This function parses event location information from TicketMaster's API and
+    converts it into a specific string that the google geolocation API requires to return
+    coordinates for use in the Event_Weather and Event_Map classes.
+    */
     var streetAddress = this.data[index].eventAddress;
     var streetAddressArray = streetAddress.split(' ');
     var addressToJoin = [
       this.data[index].eventCity + ',',
-      this.data[index].eventState + ',',
+      // this.data[index].eventState + ',',
       this.data[index].eventCountry
     ]
     for(var indexOfAddresses in addressToJoin) {
       streetAddressArray.push(addressToJoin[indexOfAddresses]);
     }
     return streetAddressArray.join('+');
-  }
-
-  handleTicketMasterError(error) {
-    console.log(error);
   }
 
   getLocationData(address, index) {
@@ -96,21 +128,34 @@ class Display_result {
     }
     this.data[index].coordinates = coordinates;
     this.render(index);
-    this.getLocationInfo(index);
+    this.getLocationWeather(index);
   }
 
-  getCurrentWeatherDataFromServer(weather, index) {
+  getLocationWeather(index) {
+    var latitude = this.data[index].coordinates.lat;
+    var longitude = this.data[index].coordinates.lng;
+    var mapParent = $('.' + index + ' .map-info');
+    var weatherParent = $('.' + index + ' .weather-info');
+    var map = new Event_Map(latitude, longitude, index, mapParent, 16);
+    var weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
+    map.render();
+    weather.render();
+    this.getCurrentWeatherData(weather, index);
+  }
+
+  getCurrentWeatherData(weather, index) {
     var key = "ba298869db4c59aadd8bdebcb3a3e02c";
     var ajaxConfigObject = {
       dataType: 'json',
       url: "http://api.openweathermap.org/data/2.5/weather?lat=" + weather.weatherData.lat + "&lon=" + weather.weatherData.lon + "&appid=" + key,
       method: 'GET',
-      success: response => this.processGetServerWeatherData(response, weather, index),
-      error: this.processGetServerError
+      success: response => this.processWeatherData(response, weather, index),
+      error: this.processWeatherDataError
     }
     $.ajax(ajaxConfigObject);
   }
-  processGetServerWeatherData(response, weather, index) {
+
+  processWeatherData(response, weather, index) {
     console.log(response);
     var currentLocationName = response.name;
     var currentTemp = response.main.temp;
@@ -123,21 +168,8 @@ class Display_result {
     $(".weather-description-"+index).text(currentWeatherDescription);
   }
 
-  processGetServerError(response) {
+  processWeatherDataError(response) {
     console.log(response);
-  }
-
-
-  getLocationInfo(index){
-    var latitude = this.data[index].coordinates.lat;
-    var longitude = this.data[index].coordinates.lng;
-    var mapParent = $('.' + index + ' .map-info');
-    var weatherParent = $('.' + index + ' .weather-info');
-    var map = new Event_Map(latitude, longitude, index, mapParent, 16);
-    var weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
-    map.render();
-    weather.render();
-    this.getCurrentWeatherDataFromServer(weather, index);
   }
 
   render(index) {
@@ -145,12 +177,15 @@ class Display_result {
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
     $locationInfo.append($weatherInfo, $mapInfo);
+
     var $eventTitle = $('<div>').addClass('event-title');
     var $eventDescription = $('<div>').addClass('event-description');
     var $eventInfo = $('<div>').addClass('event-info');
     $eventInfo.append($eventTitle, $eventDescription);
+
     var $eventResult = $('<div>').addClass('result ' + index);
     $eventResult.append($eventInfo, $locationInfo);
-    $('#search-result-container').append($eventResult);
+
+    this.elementConfig.searchContainer.append($eventResult);
   }
 }

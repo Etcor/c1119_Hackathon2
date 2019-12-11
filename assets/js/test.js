@@ -1,18 +1,10 @@
-$(document).ready(initApp);
+// $(document).ready(initApp);
 
-function initApp(){
-//  $('.makeMap').on('click', makeMap);
-}
-
-var parent = $('.ph-event-name .map-info');
-var makinMaps = new Event_Map(33.634870, -117.740450, 'learning-fuze', parent, 16);
-
-var test = new Display_result({
-  searchButton: $('#search-button')
-});
-test.addEventHandlers();
-
-
-function makeMap(){
- makinMaps.render();
-}
+// function initApp(){
+//  var application = new Display_result({
+//   searchButton: $('#search-button'),
+//   searchInput: $('#search-input'),
+//   searchContainer: $('#search-result-container')
+//  });
+//  application.addEventHandlers();
+// }
