@@ -1,9 +1,9 @@
 
 class Event_Weather_Current {
-  constructor(lat, lon, parentElem, index) {
+  constructor(lat, lng, parentElem, index) {
     this.weatherData = {
       lat: lat,
-      lon: lon,
+      lng: lng,
       index: index
     };
     this.parentElem = $(parentElem);
@@ -25,7 +25,12 @@ class Event_Weather_Current {
     this.domElements.temp = $("<div>").addClass("temp-current weather-temp-" + this.weatherData.index);
     this.domElements.icon = $("<img>").addClass("icon-current weather-icon-" + this.weatherData.index);
     this.domElements.description = $("<h3>").addClass("weather-description weather-description-" + this.weatherData.index);
-
-    this.parentElem.append(this.domElements.title, this.domElements.name, this.domElements.tempIconContainer.append(this.domElements.temp, this.domElements.icon), this.domElements.description);
+    this.parentElem.append(
+      this.domElements.title,
+      this.domElements.name,
+      this.domElements.tempIconContainer.append(
+        this.domElements.temp,
+        this.domElements.icon),
+      this.domElements.description);
   }
 }

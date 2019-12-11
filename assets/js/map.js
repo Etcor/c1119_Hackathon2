@@ -1,6 +1,5 @@
 class Event_Map {
   constructor(latitude, longitude, eventName, parentElement, mapZoom){
-
     this.coordinates = {
       lat: latitude,
       lng: longitude

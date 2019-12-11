@@ -7,19 +7,21 @@ class Display_result {
       searchContainer: $(elementConfig.searchContainer)
     };
     this.currentEventAddress = null;
-    this.render = this.render.bind(this);
-    this.getLocationData = this.getLocationData.bind(this);
-    this.parseLocationData = this.parseLocationData.bind(this);
+
     this.getSearchResult = this.getSearchResult.bind(this);
+    this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
+    this.handleBadKeyword = this.handleBadKeyword.bind(this);
+    this.clearInputField = this.clearInputField.bind(this);
     this.handleSuccessfulSearchResult = this.handleSuccessfulSearchResult.bind(this);
     this.handleSearchError = this.handleSearchError.bind(this);
     this.getAddressForGeolocation = this.getAddressForGeolocation.bind(this);
+    this.getLocationData = this.getLocationData.bind(this);
+    this.parseLocationData = this.parseLocationData.bind(this);
+    this.handleLocationDataError = this.handleLocationDataError.bind(this);
     this.getCurrentWeatherData = this.getCurrentWeatherData.bind(this);
     this.processWeatherData = this.processWeatherData.bind(this);
     this.processWeatherDataError = this.processWeatherDataError.bind(this);
-    this.handleBadKeyword = this.handleBadKeyword.bind(this);
-    this.clearInputField = this.clearInputField.bind(this);
-    this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
+    this.render = this.render.bind(this);
   }
 
   addEventHandlers() {
@@ -37,9 +39,10 @@ class Display_result {
     $('.landing-page').addClass('hidden');
     $('.result').remove();
     $('.content-loading').removeClass('hidden');
+
     var ajaxConfig = {
       type: "GET",
-      url: "https://app.ticketmaster.com/discovery/v2/events.json?size=3&apikey=RpWHpqTak6PwdixiLGSrrPsoBINm24CG",
+      url: "https://app.ticketmaster.com/discovery/v2/events.json?size=5&apikey=RpWHpqTak6PwdixiLGSrrPsoBINm24CG"+ '&sort=date,asc',
       data: {
         keyword: textInputField
       },
@@ -77,7 +80,6 @@ class Display_result {
       this.handleBadKeyword();
       return;
     }
-    console.log("OBJECT: ", response);
     var responseTarget = response._embedded.events;
     for(var searchResultIndex in responseTarget){
       this.data[searchResultIndex] = {
@@ -85,7 +87,6 @@ class Display_result {
         venueName: responseTarget[searchResultIndex]._embedded.venues[0]['name'],
         eventDate: responseTarget[searchResultIndex].dates.start['localDate'],
         eventCity: responseTarget[searchResultIndex]._embedded.venues[0].city['name'],
-        // eventState: responseTarget[searchResultIndex]._embedded.venues[0].state['name'],
         eventAddress: responseTarget[searchResultIndex]._embedded.venues[0].address['line1'],
         eventCountry: responseTarget[searchResultIndex]._embedded.venues[0].country['countryCode'],
         seatingChartLink: responseTarget[searchResultIndex].seatmap['staticUrl'],
@@ -96,7 +97,6 @@ class Display_result {
       };
       var address = this.getAddressForGeolocation(searchResultIndex);
       this.getLocationData(address, searchResultIndex);
-
     }
   }
 
@@ -113,8 +113,7 @@ class Display_result {
     var streetAddress = this.data[index].eventAddress;
     var streetAddressArray = streetAddress.split(' ');
     var addressToJoin = [
-      this.data[index].eventCity + ',',
-      // this.data[index].eventState + ',',
+      this.data[index].eventCity,
       this.data[index].eventCountry
     ]
     for(var indexOfAddresses in addressToJoin) {
@@ -129,11 +128,13 @@ class Display_result {
       url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address + '&key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ',
       method: 'GET',
       success: res => this.parseLocationData(res, index),
-      error: function (response) {
-        console.log(response);
-      }
+      error: this.handleLocationDataError
     }
     $.ajax(ajaxConfigObject);
+  }
+
+  handleLocationDataError(response) {
+    console.log(response);
   }
 
   parseLocationData(response, index) {
@@ -162,7 +163,7 @@ class Display_result {
     var key = "ba298869db4c59aadd8bdebcb3a3e02c";
     var ajaxConfigObject = {
       dataType: 'json',
-      url: "http://api.openweathermap.org/data/2.5/weather?lat=" + weather.weatherData.lat + "&lon=" + weather.weatherData.lon + "&appid=" + key,
+      url: "http://api.openweathermap.org/data/2.5/weather?lat=" + weather.weatherData.lat + "&lon=" + weather.weatherData.lng + "&appid=" + key,
       method: 'GET',
       success: response => this.processWeatherData(response, weather, index),
       error: this.processWeatherDataError
@@ -171,7 +172,6 @@ class Display_result {
   }
 
   processWeatherData(response, weather, index) {
-    console.log(response);
     var currentLocationName = response.name;
     var currentTemp = response.main.temp;
     var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
@@ -182,29 +182,6 @@ class Display_result {
     } else if (currentTempFahr < 55) {
       $(".weather-temp-"+index).parent().parent().addClass("cold-temp");
     }
-    // switch (currentWeatherDescription) {
-    //   case "clear sky":
-    //     return;
-    //   case "few clouds":
-    //     return;
-    //   case "scattered clouds":
-    //     return;
-    //   case "broken clouds":
-    //     return;
-    //   case "shower rain":
-    //     return;
-    //   case "rain":
-    //     return;
-    //   case "thunderstorm":
-    //     return;
-    //   case "snow":
-    //     return;
-    //   case "mist":
-    //     return;
-    //   default:
-    //     break;
-    // }
-
     $(".weather-title-"+index).text(currentLocationName);
     $(".weather-temp-"+index).text(currentTempFahr).append($("<span>").html("&#8457"));
     $(".weather-icon-"+index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
@@ -216,27 +193,32 @@ class Display_result {
   }
 
   render(index) {
-
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
     $locationInfo.append($weatherInfo, $mapInfo);
+
     var $pTagVenue = $('<p>').text(this.data[index].venueName);
     var $pTagDate = $('<p>').text(this.data[index].eventDate);
     var $pTagTime = $('<p>').text(this.data[index].eventStartTime);
-
-    // var $pTagAddress = $('<p>').text(this.data[index].eventAddress);
     var $aTagSeatingChart = $('<a>').text('Click For Seating Chart!').attr({
       href: this.data[index].seatingChartLink,
       target: '_blank'
-    })
+    });
     var $aTagTicketLink = $('<a>').text('Buy Tickets Now!').attr({
       href: this.data[index].ticketLink,
       target: '_blank'
-    })
+    });
+
     var $eventTitle = $('<div>').addClass('event-title').text(this.data[index].eventName);
     var $eventDescription = $('<div>').addClass('event-description');
-    $eventDescription.append($pTagVenue, $pTagDate, $pTagTime, $aTagSeatingChart, $aTagTicketLink);
+    $eventDescription.append(
+      $pTagVenue,
+      $pTagDate,
+      $pTagTime,
+      $aTagSeatingChart,
+      $aTagTicketLink
+    );
     var $eventInfo = $('<div>').addClass('event-info');
     $eventInfo.append($eventTitle, $eventDescription);
     var $eventResult = $('<div>').addClass('result ' + index);
