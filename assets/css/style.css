@@ -86,21 +86,105 @@ body {
   margin-top: 30px;
 }
 .keyword-error {
- border: 1px solid red;
- box-shadow: #e74c3c 0 0 10px;
+  border: 1px solid red;
+  box-shadow: #e74c3c 0 0 10px;
 }
 .keyword-error::placeholder {
- color: #e74c3c;
+  color: #e74c3c;
 }
 .btn-error {
- background: #e74c3c;
+  background: #e74c3c;
 }
-/* .app-default-content {
- display: flex;
- width: 100%;
- height: 80.5vh;
- background: #95a5a6;
-} */
+.landing-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 100%;
+}
+.img-container {
+  height: 1000px;
+  width: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: space-evenly;
+  background-color: #dcdde1;
+  border-radius: 20px;
+  box-shadow: #0f0f0f25 0 0 20px;
+}
+.sad-man {
+  width: 100%;
+  height: 760px;
+  background-image: url("/assets/images/sad-man.jpg");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.landing-page > * {
+  font-size: 55px;
+}
+.landing-page-title, .landing-page-purpose {
+  position: relative;
+  text-transform: uppercase;
+}
+.about-us-container {
+  position: relative;
+  height: 550px;
+  width: 90%;
+  padding: 50px;
+  border-radius: 40px;
+  box-shadow: #0f0f0f25 0 0 20px;
+  background: #dcdde1;
+}
+.about-us{
+  width: 90%;
+  text-align: justify;
+  text-justify: newspaper;
+  color: #000;
+  font-size: 65px;
+  margin: auto;
+}
+.content-loading {
+  display: inline-block;
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  left: 43%;
+}
+.content-loading div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  margin: 8px;
+  border: 12px solid #fff;
+  border-radius: 50%;
+  animation: content-loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #fff transparent transparent transparent;
+}
+.content-loading div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.content-loading div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.content-loading div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes content-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
   /****************/
  /*  Event Info  */
@@ -135,8 +219,8 @@ body {
   align-items: center;
 }
 .location-info > * , .map-info > *{
- border-radius: 16px;
- box-shadow: #222f3e38 0 0 6px;
+  border-radius: 16px;
+  box-shadow: #222f3e38 0 0 6px;
 }
 
   /******************/
@@ -169,9 +253,7 @@ h2.weather-location-name {
 .temp-current {
   font-size: 4.875rem;
 }
-/* img.icon-current {
 
-} */
 h3.weather-description {
     text-align: center;
     font-size: 2rem;
@@ -188,7 +270,6 @@ h3.weather-description {
   width: 100%;
   height: 100%;
 }
-
 .hidden {
- display: none;
+  display: none;
 }
