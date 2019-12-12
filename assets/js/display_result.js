@@ -7,6 +7,8 @@ class Display_result {
       searchContainer: $(elementConfig.searchContainer)
     };
     this.currentEventAddress = null;
+    this.numberOfEvents = null;
+    this.numberOfEventsCompleted = null;
 
     this.getSearchResult = this.getSearchResult.bind(this);
     this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
@@ -80,6 +82,7 @@ class Display_result {
       this.handleBadKeyword();
       return;
     }
+    this.data = [];
     var responseTarget = response._embedded.events;
     for(var searchResultIndex in responseTarget){
       this.data[searchResultIndex] = {
@@ -95,6 +98,7 @@ class Display_result {
         ticketLink: responseTarget[searchResultIndex]['url'],
         twentyFourHourTime: responseTarget[searchResultIndex].dates.start['localTime']
       };
+      this.numberOfEvents++;
       var address = this.getAddressForGeolocation(searchResultIndex);
       this.getLocationData(address, searchResultIndex);
     }
@@ -110,16 +114,13 @@ class Display_result {
     converts it into a specific string that the google geolocation API requires to return
     coordinates for use in the Event_Weather and Event_Map classes.
     */
-    var streetAddress = this.data[index].eventAddress;
-    var streetAddressArray = streetAddress.split(' ');
-    var addressToJoin = [
+    let streetAddressArray = this.data[index].eventAddress.split(' ');
+    let addressToJoin = [
+      ...streetAddressArray,
       this.data[index].eventCity,
       this.data[index].eventCountry
-    ]
-    for(var indexOfAddresses in addressToJoin) {
-      streetAddressArray.push(addressToJoin[indexOfAddresses]);
-    }
-    return streetAddressArray.join('+');
+    ];
+    return addressToJoin.join('+');
   }
 
   getLocationData(address, index) {
@@ -137,23 +138,30 @@ class Display_result {
     console.log(response);
   }
 
-  parseLocationData(response, index) {
-    var coordinates = {
-      lat: response.results[0].geometry.location.lat,
-      lng: response.results[0].geometry.location.lng
+  parseLocationData(response, resultReceived) {
+    let { results: { [0]: { geometry: { location } } } }  = response;
+    let coordinates = {
+      lat: location.lat,
+      lng: location.lng
     }
-    this.data[index].coordinates = coordinates;
-    this.render(index);
-    this.getLocationWeather(index);
+    this.data[resultReceived].coordinates = coordinates;
+    this.numberOfEventsCompleted++;
+    let allRequestsCompleted = this.numberOfEvents === this.numberOfEventsCompleted;
+    if(allRequestsCompleted) {
+      for(let indexInDataToRender = 0; indexInDataToRender < this.data.length; indexInDataToRender++) {
+        this.render(indexInDataToRender);
+        this.getLocationWeatherAndMap(indexInDataToRender);
+      }
+    }
   }
 
-  getLocationWeather(index) {
-    var latitude = this.data[index].coordinates.lat;
-    var longitude = this.data[index].coordinates.lng;
-    var mapParent = $('.' + index + ' .map-info');
-    var weatherParent = $('.' + index + ' .weather-info');
-    var map = new Event_Map(latitude, longitude, index, mapParent, 16);
-    var weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
+  getLocationWeatherAndMap(index) {
+    let latitude = this.data[index].coordinates.lat;
+    let longitude = this.data[index].coordinates.lng;
+    let mapParent = $('.' + index + ' .map-info');
+    let weatherParent = $('.' + index + ' .weather-info');
+    let map = new Event_Map(latitude, longitude, index, mapParent, 16);
+    let weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
     map.render();
     weather.render();
     this.getCurrentWeatherData(weather, index);
@@ -196,8 +204,6 @@ class Display_result {
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
-    $locationInfo.append($weatherInfo, $mapInfo);
-
     var $pTagVenue = $('<p>').text(this.data[index].venueName);
     var $pTagDate = $('<p>').text(this.data[index].eventDate);
     var $pTagTime = $('<p>').text(this.data[index].eventStartTime);
@@ -209,9 +215,11 @@ class Display_result {
       href: this.data[index].ticketLink,
       target: '_blank'
     });
-
     var $eventTitle = $('<div>').addClass('event-title').text(this.data[index].eventName);
     var $eventDescription = $('<div>').addClass('event-description');
+    var $eventInfo = $('<div>').addClass('event-info');
+    var $eventResult = $('<div>').addClass('result ' + index);
+    $locationInfo.append($weatherInfo, $mapInfo);
     $eventDescription.append(
       $pTagVenue,
       $pTagDate,
@@ -219,9 +227,7 @@ class Display_result {
       $aTagSeatingChart,
       $aTagTicketLink
     );
-    var $eventInfo = $('<div>').addClass('event-info');
     $eventInfo.append($eventTitle, $eventDescription);
-    var $eventResult = $('<div>').addClass('result ' + index);
     $eventResult.append($eventInfo, $locationInfo);
     this.elementConfig.searchContainer.append($eventResult);
     $('.content-loading').addClass('hidden');
