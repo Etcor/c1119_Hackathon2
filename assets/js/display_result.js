@@ -1,6 +1,6 @@
 class Display_result {
   constructor (elementConfig) {
-    this.data = {};
+    this.data = [];
     this.elementConfig = {
       searchButton: $(elementConfig.searchButton),
       searchInput: $(elementConfig.searchInput),
@@ -9,38 +9,21 @@ class Display_result {
     this.currentEventAddress = null;
     this.numberOfEvents = null;
     this.numberOfEventsCompleted = null;
-
-    this.getSearchResult = this.getSearchResult.bind(this);
-    this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
-    this.handleBadKeyword = this.handleBadKeyword.bind(this);
-    this.clearInputField = this.clearInputField.bind(this);
-    this.handleSuccessfulSearchResult = this.handleSuccessfulSearchResult.bind(this);
-    this.handleSearchError = this.handleSearchError.bind(this);
-    this.getAddressForGeolocation = this.getAddressForGeolocation.bind(this);
-    this.getLocationData = this.getLocationData.bind(this);
-    this.parseLocationData = this.parseLocationData.bind(this);
-    this.handleLocationDataError = this.handleLocationDataError.bind(this);
-    this.getCurrentWeatherData = this.getCurrentWeatherData.bind(this);
-    this.processWeatherData = this.processWeatherData.bind(this);
-    this.processWeatherDataError = this.processWeatherDataError.bind(this);
-    this.render = this.render.bind(this);
+    this.addEventHandlers();
   }
 
-  addEventHandlers() {
+  addEventHandlers = () => {
     this.elementConfig.searchButton.on('click', this.getSearchResult);
     this.elementConfig.searchInput.on('click', this.clearInputField);
     this.elementConfig.searchInput.on('keypress', this.getSearchResultOnEnterKey);
   }
 
-  getSearchResult() {
+  getSearchResult = () => {
     var textInputField = this.elementConfig.searchInput.val();
-    if(!textInputField){
+    if(!textInputField) {
       this.handleBadKeyword();
       return;
     }
-    $('.landing-page').addClass('hidden');
-    $('.result').remove();
-    $('.content-loading').removeClass('hidden');
 
     var ajaxConfig = {
       type: "GET",
@@ -56,20 +39,20 @@ class Display_result {
     $.ajax(ajaxConfig);
   }
 
-  getSearchResultOnEnterKey(event) {
+  getSearchResultOnEnterKey = event => {
     if (event.keyCode == 13) {
       this.getSearchResult();
     }
   }
 
-  handleBadKeyword() {
+  handleBadKeyword = () => {
     this.elementConfig.searchInput.addClass('keyword-error');
     this.elementConfig.searchButton.addClass('btn-error');
     $('.fas').removeClass('fa-arrow-right').addClass('fa-times');
     this.elementConfig.searchInput.val('').attr('placeholder', 'Error: No events exist by that name');
   }
 
-  clearInputField() {
+  clearInputField = () => {
     this.elementConfig.searchInput.removeClass('keyword-error');
     this.elementConfig.searchButton.removeClass('btn-error');
     $('.fas').addClass('fa-arrow-right').removeClass('fa-times');
@@ -77,11 +60,15 @@ class Display_result {
     this.elementConfig.searchInput.focus().select()
   }
 
-  handleSuccessfulSearchResult(response) {
+  handleSuccessfulSearchResult = response => {
     if (!response._embedded) {
       this.handleBadKeyword();
       return;
     }
+    $('.landing-page').addClass('hidden');
+    $('.result').remove();
+    $('.content-loading').removeClass('hidden');
+
     this.data = [];
     var responseTarget = response._embedded.events;
     for(var searchResultIndex in responseTarget){
@@ -104,16 +91,12 @@ class Display_result {
     }
   }
 
-  handleSearchError(error) {
-    console.log(error);
-  }
+  handleSearchError = error => console.log(error);
 
-  getAddressForGeolocation(index) {
-    /*
-    This function parses event location information from TicketMaster's API and
+  getAddressForGeolocation = index => {
+    /*This function parses event location information from TicketMaster's API and
     converts it into a specific string that the google geolocation API requires to return
-    coordinates for use in the Event_Weather and Event_Map classes.
-    */
+    coordinates.*/
     let streetAddressArray = this.data[index].eventAddress.split(' ');
     let addressToJoin = [
       ...streetAddressArray,
@@ -123,7 +106,7 @@ class Display_result {
     return addressToJoin.join('+');
   }
 
-  getLocationData(address, index) {
+  getLocationData = (address, index) => {
     var ajaxConfigObject = {
       dataType: 'JSON',
       url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + address + '&key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ',
@@ -134,11 +117,9 @@ class Display_result {
     $.ajax(ajaxConfigObject);
   }
 
-  handleLocationDataError(response) {
-    console.log(response);
-  }
+  handleLocationDataError = (response) => console.log(response);
 
-  parseLocationData(response, resultReceived) {
+  parseLocationData = (response, resultReceived) => {
     let { results: { [0]: { geometry: { location } } } }  = response;
     let coordinates = {
       lat: location.lat,
@@ -155,7 +136,7 @@ class Display_result {
     }
   }
 
-  getLocationWeatherAndMap(index) {
+  getLocationWeatherAndMap = index => {
     let latitude = this.data[index].coordinates.lat;
     let longitude = this.data[index].coordinates.lng;
     let mapParent = $('.' + index + ' .map-info');
@@ -167,7 +148,7 @@ class Display_result {
     this.getCurrentWeatherData(weather, index);
   }
 
-  getCurrentWeatherData(weather, index) {
+  getCurrentWeatherData = (weather, index) => {
     var key = "ba298869db4c59aadd8bdebcb3a3e02c";
     var ajaxConfigObject = {
       dataType: 'json',
@@ -179,7 +160,7 @@ class Display_result {
     $.ajax(ajaxConfigObject);
   }
 
-  processWeatherData(response, weather, index) {
+  processWeatherData = (response, weather, index) => {
     var currentLocationName = response.name;
     var currentTemp = response.main.temp;
     var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
@@ -196,11 +177,9 @@ class Display_result {
     $(".weather-description-"+index).text(currentWeatherDescription);
   }
 
-  processWeatherDataError(response) {
-    console.log(response);
-  }
+  processWeatherDataError = response => console.log(response);
 
-  render(index) {
+  render = index => {
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');

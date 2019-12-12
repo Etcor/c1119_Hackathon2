@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "monsterrat", sans-serif;
 }
 body {
   height: 100vh;
@@ -148,7 +149,7 @@ a {
   text-align: justify;
   text-justify: newspaper;
   color: #000;
-  font-size: 65px;
+  font-size: 58px;
   margin: auto;
 }
 .content-loading {
