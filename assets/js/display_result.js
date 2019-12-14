@@ -1,6 +1,6 @@
 class Display_result {
   constructor (elementConfig) {
-    this.data = {};
+    this.data = [];
     this.elementConfig = {
       searchButton: $(elementConfig.searchButton),
       searchInput: $(elementConfig.searchInput),
@@ -12,17 +12,10 @@ class Display_result {
 
     this.getSearchResult = this.getSearchResult.bind(this);
     this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
-    this.handleBadKeyword = this.handleBadKeyword.bind(this);
     this.clearInputField = this.clearInputField.bind(this);
     this.handleSuccessfulSearchResult = this.handleSuccessfulSearchResult.bind(this);
-    this.handleSearchError = this.handleSearchError.bind(this);
     this.getAddressForGeolocation = this.getAddressForGeolocation.bind(this);
-    this.getLocationData = this.getLocationData.bind(this);
-    this.parseLocationData = this.parseLocationData.bind(this);
-    this.handleLocationDataError = this.handleLocationDataError.bind(this);
-    this.getCurrentWeatherData = this.getCurrentWeatherData.bind(this);
-    this.processWeatherData = this.processWeatherData.bind(this);
-    this.processWeatherDataError = this.processWeatherDataError.bind(this);
+    this.returnHome = this.returnHome.bind(this);
     this.render = this.render.bind(this);
   }
 
@@ -30,6 +23,7 @@ class Display_result {
     this.elementConfig.searchButton.on('click', this.getSearchResult);
     this.elementConfig.searchInput.on('click', this.clearInputField);
     this.elementConfig.searchInput.on('keypress', this.getSearchResultOnEnterKey);
+    $('.home-btn').on('click', this.returnHome);
   }
 
   getSearchResult() {
@@ -38,9 +32,6 @@ class Display_result {
       this.handleBadKeyword();
       return;
     }
-    $('.landing-page').addClass('hidden');
-    $('.result').remove();
-    $('.content-loading').removeClass('hidden');
 
     var ajaxConfig = {
       type: "GET",
@@ -65,14 +56,18 @@ class Display_result {
   handleBadKeyword() {
     this.elementConfig.searchInput.addClass('keyword-error');
     this.elementConfig.searchButton.addClass('btn-error');
-    $('.fas').removeClass('fa-arrow-right').addClass('fa-times');
+    $('.fas')
+      .removeClass('fa-arrow-right')
+      .addClass('fa-times');
     this.elementConfig.searchInput.val('').attr('placeholder', 'Error: No events exist by that name');
   }
 
   clearInputField() {
     this.elementConfig.searchInput.removeClass('keyword-error');
     this.elementConfig.searchButton.removeClass('btn-error');
-    $('.fas').addClass('fa-arrow-right').removeClass('fa-times');
+    $('.fas')
+      .addClass('fa-arrow-right')
+      .removeClass('fa-times');
     this.elementConfig.searchInput.attr('placeholder', 'Enter Your Event');
     this.elementConfig.searchInput.focus().select()
   }
@@ -83,6 +78,11 @@ class Display_result {
       return;
     }
     this.data = [];
+
+    $('.landing-page').addClass('hidden');
+    $('.result').remove();
+    $('.content-loading').removeClass('hidden');
+
     var responseTarget = response._embedded.events;
     for(var searchResultIndex in responseTarget){
       this.data[searchResultIndex] = {
@@ -92,12 +92,14 @@ class Display_result {
         eventCity: responseTarget[searchResultIndex]._embedded.venues[0].city['name'],
         eventAddress: responseTarget[searchResultIndex]._embedded.venues[0].address['line1'],
         eventCountry: responseTarget[searchResultIndex]._embedded.venues[0].country['countryCode'],
-        seatingChartLink: responseTarget[searchResultIndex].seatmap['staticUrl'],
         eventStartTime: responseTarget[searchResultIndex].dates.start['localTime'],
         eventInfo: responseTarget[searchResultIndex]['info'],
         ticketLink: responseTarget[searchResultIndex]['url'],
         twentyFourHourTime: responseTarget[searchResultIndex].dates.start['localTime']
       };
+      if (responseTarget[searchResultIndex].seatmap && responseTarget[searchResultIndex].seatmap['staticUrl']) {
+        this.data[searchResultIndex].seatingChartLink = responseTarget[searchResultIndex].seatmap['staticUrl'];
+      }
       this.numberOfEvents++;
       var address = this.getAddressForGeolocation(searchResultIndex);
       this.getLocationData(address, searchResultIndex);
@@ -200,6 +202,11 @@ class Display_result {
     console.log(response);
   }
 
+  returnHome() {
+    $('.result').remove();
+    $('.landing-page').removeClass('hidden');
+  }
+
   render(index) {
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
@@ -207,15 +214,21 @@ class Display_result {
     var $pTagVenue = $('<p>').text(this.data[index].venueName);
     var $pTagDate = $('<p>').text(this.data[index].eventDate);
     var $pTagTime = $('<p>').text(this.data[index].eventStartTime);
-    var $aTagSeatingChart = $('<a>').text('Click For Seating Chart!').attr({
-      href: this.data[index].seatingChartLink,
-      target: '_blank'
+    var $aTagSeatingChart = $('<a>')
+      .text('Click For Seating Chart!')
+      .attr({
+        href: this.data[index].seatingChartLink,
+        target: '_blank'
     });
-    var $aTagTicketLink = $('<a>').text('Buy Tickets Now!').attr({
-      href: this.data[index].ticketLink,
-      target: '_blank'
+    var $aTagTicketLink = $('<a>')
+      .text('Buy Tickets Now!')
+      .attr({
+        href: this.data[index].ticketLink,
+        target: '_blank'
     });
-    var $eventTitle = $('<div>').addClass('event-title').text(this.data[index].eventName);
+    var $eventTitle = $('<div>')
+      .addClass('event-title')
+      .text(this.data[index].eventName);
     var $eventDescription = $('<div>').addClass('event-description');
     var $eventInfo = $('<div>').addClass('event-info');
     var $eventResult = $('<div>').addClass('result ' + index);

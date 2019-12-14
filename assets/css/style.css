@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
 }
 body {
   height: 100vh;
@@ -16,7 +17,7 @@ a {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #2d3436;
+  background: #2C3A47;
   align-items: center;
 }
 #app-header {
@@ -24,10 +25,8 @@ a {
   position: relative;
   width: 100%;
   height: 140px;
-  background: #0f0f0f;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
 }
 #title {
   position: relative;
@@ -35,11 +34,16 @@ a {
   font-size: 60px;
   color: #fff;
 }
+.home-btn {
+  position: absolute;
+  left: 30px;
+  color: white;
+}
 #search-bar {
   position: relative;
   width: 80%;
   height: 120px;
-  background: #ecf0f1;
+  background: #f5f6fa;
   border-radius: 70px;
   margin-bottom: 40px;
   box-shadow: #7f8c8d 0 0 5px;
@@ -69,10 +73,11 @@ a {
 }
 #search-result-container {
   position: relative;
+  bottom: 0;
   width: 100%;
-  height: 80%;
+  height: 100%;
   overflow: auto;
-  background: #7f8c8d;
+  background: #ecf0f1;
   align-items: center;
   justify-content: center;
   align-content: center;
@@ -82,7 +87,7 @@ a {
   position: relative;
   width: 94%;
   height: 700px;
-  background: #ecf0f1;
+  background: #f5f6fa;
   border-radius: 20px;
   box-shadow: #222f3e73 0 0 8px;
   margin: auto;
@@ -108,23 +113,23 @@ a {
   height: 100%;
 }
 .img-container {
-  height: 1000px;
+  height: 50%;
   width: 90%;
   position: relative;
   display: flex;
   flex-direction: column;
   text-align: center;
   justify-content: space-evenly;
-  background-color: #dcdde1;
-  border-radius: 20px;
+  background-color: #f5f6fa;
+  border-radius: 10px;
   box-shadow: #0f0f0f25 0 0 20px;
 }
 .sad-man {
   width: 100%;
-  height: 760px;
+  height: 70%;
   background-image: url("../images/sad-man.jpg");
-  background-position: center;
-  background-size: contain;
+  background-position: top;
+  background-size: cover;
   background-repeat: no-repeat;
 }
 .landing-page > * {
@@ -136,20 +141,53 @@ a {
 }
 .about-us-container {
   position: relative;
-  height: 550px;
   width: 90%;
-  padding: 50px;
-  border-radius: 40px;
+  padding: 2.5%;
+  border-radius: 10px;
   box-shadow: #0f0f0f25 0 0 20px;
-  background: #dcdde1;
-}
-.about-us{
-  width: 90%;
+  background: #f5f6fa;
   text-align: justify;
   text-justify: newspaper;
+}
+.about-us{
+  width: 100%;
+  height: 100%;
   color: #000;
-  font-size: 65px;
-  margin: auto;
+  font-size: 3.2rem;
+}
+.testimonial {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 90%;
+  height: 25%;
+  padding: 5% 5% 0% 5%;
+  border-radius: 10px;
+  box-shadow: #0f0f0f25 0 0 20px;
+  background: #f5f6fa;
+  text-align: justify;
+  text-justify: newspaper;
+}
+.testimonial > * {
+  position: relative;
+  font-size: 2.5rem;
+  font-style: italic;
+}
+.testimonial > *:before {
+  position: relative;
+  position: absolute;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2.2rem;
+  top: -50px;
+  left: -10px;
+}
+.testimonial-1:before {
+  content: 'Tech phonies review';
+}
+.testimonial-2:before {
+  content: 'Team 3 review';
 }
 .content-loading {
   display: inline-block;
@@ -166,10 +204,10 @@ a {
   width: 140px;
   height: 140px;
   margin: 8px;
-  border: 12px solid #fff;
+  border: 12px solid #747d8c;
   border-radius: 50%;
   animation: content-loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #fff transparent transparent transparent;
+  border-color: #747d8c transparent transparent transparent;
 }
 .content-loading div:nth-child(1) {
   animation-delay: -0.45s;
