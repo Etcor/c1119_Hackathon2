@@ -9,6 +9,7 @@ class Display_result {
     this.currentEventAddress = null;
     this.numberOfEvents = null;
     this.numberOfEventsCompleted = null;
+    this.darkMode = false;
 
     this.getSearchResult = this.getSearchResult.bind(this);
     this.getSearchResultOnEnterKey = this.getSearchResultOnEnterKey.bind(this);
@@ -16,6 +17,7 @@ class Display_result {
     this.handleSuccessfulSearchResult = this.handleSuccessfulSearchResult.bind(this);
     this.getAddressForGeolocation = this.getAddressForGeolocation.bind(this);
     this.returnHome = this.returnHome.bind(this);
+    this.activateDarkMode = this.activateDarkMode.bind(this);
     this.render = this.render.bind(this);
   }
 
@@ -24,6 +26,7 @@ class Display_result {
     this.elementConfig.searchInput.on('click', this.clearInputField);
     this.elementConfig.searchInput.on('keypress', this.getSearchResultOnEnterKey);
     $('.home-btn').on('click', this.returnHome);
+    $('.darkmode-btn').on('click', this.activateDarkMode);
   }
 
   getSearchResult() {
@@ -56,7 +59,7 @@ class Display_result {
   handleBadKeyword() {
     this.elementConfig.searchInput.addClass('keyword-error');
     this.elementConfig.searchButton.addClass('btn-error');
-    $('.fas')
+    $('.fa-arrow-right')
       .removeClass('fa-arrow-right')
       .addClass('fa-times');
     this.elementConfig.searchInput.val('').attr('placeholder', 'Error: No events exist by that name');
@@ -65,7 +68,7 @@ class Display_result {
   clearInputField() {
     this.elementConfig.searchInput.removeClass('keyword-error');
     this.elementConfig.searchButton.removeClass('btn-error');
-    $('.fas')
+    $('.fa-times')
       .addClass('fa-arrow-right')
       .removeClass('fa-times');
     this.elementConfig.searchInput.attr('placeholder', 'Enter Your Event');
@@ -204,6 +207,8 @@ class Display_result {
 
   returnHome() {
     $('.result').remove();
+    this.clearInputField();
+    this.elementConfig.searchInput.val('');
     $('.landing-page').removeClass('hidden');
   }
 
@@ -216,20 +221,53 @@ class Display_result {
 
   formatTime(index) {
     let dateAndTime = `${this.formatDate(index)} ${this.data[index].eventStartTime}`;
-    var date = new Date(dateAndTime);
-    var options = {
+    let date = new Date(dateAndTime);
+    const options = {
       hour: 'numeric',
       minute: 'numeric',
       hour12: true
     };
-    var timeString = date.toLocaleString('en-US', options);
+    let timeString = date.toLocaleString('en-US', options);
     if(timeString === 'Invalid Date'){
       return 'TBD';
     }
     return `${timeString} local time`;
   }
 
+  activateDarkMode() {
+    let $app_container = $('#app-container');
+    let $search_result_container = $('#search-result-container');
+    let $landing_page = $(".img-container, .about-us-container, .testimonial, .search-input");
+    let $search_results = $("#search-bar, .result, .event-description > *");
+
+    if(!this.darkMode) {
+      $app_container.addClass('dark-grey');
+      $search_result_container.addClass('medium-grey');
+      $landing_page.addClass('content-grey');
+      $search_results.addClass('content-grey');
+
+      this.darkMode = true;
+
+    } else if(this.darkMode) {
+      $app_container.removeClass('dark-grey');
+      $search_result_container.removeClass('medium-grey');
+      $landing_page.removeClass('content-grey');
+      $search_results.removeClass('content-grey');
+
+      this.darkMode = false;
+    }
+  }
+
   render(index) {
+    let resultTheme;
+    let textTheme;
+    if(this.darkMode) {
+      resultTheme = `result ${index} content-grey`;
+      textTheme = 'content-grey'
+    } else {
+      resultTheme = `result ${index}`
+      textTheme = '';
+    }
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
@@ -253,7 +291,7 @@ class Display_result {
       .text(this.data[index].eventName);
     var $eventDescription = $('<div>').addClass('event-description');
     var $eventInfo = $('<div>').addClass('event-info');
-    var $eventResult = $('<div>').addClass('result ' + index);
+    var $eventResult = $('<div>').addClass(resultTheme);
     $locationInfo.append($weatherInfo, $mapInfo);
     $eventDescription.append(
       $venue,
@@ -266,5 +304,6 @@ class Display_result {
     $eventResult.append($eventInfo, $locationInfo);
     this.elementConfig.searchContainer.append($eventResult);
     $('.content-loading').addClass('hidden');
+    $('.event-description > *').addClass(textTheme);
   }
 }
