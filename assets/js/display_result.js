@@ -207,20 +207,42 @@ class Display_result {
     $('.landing-page').removeClass('hidden');
   }
 
+  formatDate(index) {
+    let eventDateArr = this.data[index].eventDate.split('-');
+    let date = new Date(eventDateArr.join('/'));
+    let month = date.toLocaleString('default', { month: 'long' });
+    return `${month} ${eventDateArr[2]}, ${eventDateArr[0]}`;
+  }
+
+  formatTime(index) {
+    let dateAndTime = `${this.formatDate(index)} ${this.data[index].eventStartTime}`;
+    var date = new Date(dateAndTime);
+    var options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+    var timeString = date.toLocaleString('en-US', options);
+    if(timeString === 'Invalid Date'){
+      return 'TBD';
+    }
+    return `${timeString} local time`;
+  }
+
   render(index) {
     var $weatherInfo = $('<div>').addClass('weather-info');
     var $mapInfo = $('<div>').addClass('map-info');
     var $locationInfo = $('<div>').addClass('location-info');
-    var $pTagVenue = $('<p>').text(this.data[index].venueName);
-    var $pTagDate = $('<p>').text(this.data[index].eventDate);
-    var $pTagTime = $('<p>').text(this.data[index].eventStartTime);
-    var $aTagSeatingChart = $('<a>')
-      .text('Click For Seating Chart!')
+    var $venue = $('<p>').text(this.data[index].venueName);
+    var $date = $('<p>').text(this.formatDate(index));
+    var $startTime = $('<p>').text(this.formatTime(index));
+    var $seatingChart = $('<a>')
+      .text('Tap For Seating Chart!')
       .attr({
         href: this.data[index].seatingChartLink,
         target: '_blank'
-    });
-    var $aTagTicketLink = $('<a>')
+      });
+    var $ticketLink = $('<a>')
       .text('Buy Tickets Now!')
       .attr({
         href: this.data[index].ticketLink,
@@ -234,11 +256,11 @@ class Display_result {
     var $eventResult = $('<div>').addClass('result ' + index);
     $locationInfo.append($weatherInfo, $mapInfo);
     $eventDescription.append(
-      $pTagVenue,
-      $pTagDate,
-      $pTagTime,
-      $aTagSeatingChart,
-      $aTagTicketLink
+      $venue,
+      $date,
+      $startTime,
+      $seatingChart,
+      $ticketLink
     );
     $eventInfo.append($eventTitle, $eventDescription);
     $eventResult.append($eventInfo, $locationInfo);

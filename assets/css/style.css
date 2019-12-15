@@ -86,7 +86,7 @@ a {
   display: flex;
   position: relative;
   width: 94%;
-  height: 700px;
+  height: 600px;
   background: #f5f6fa;
   border-radius: 20px;
   box-shadow: #222f3e73 0 0 8px;
@@ -241,8 +241,13 @@ a {
 }
 .event-info {
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1%;
 }
 .event-title {
+  position: relative;
   width: 100%;
   text-align: center;
   font-size: 48px;
@@ -250,10 +255,16 @@ a {
   margin-bottom: 20px;
 }
 .event-description {
+  position: relative;
   width: 90%;
-  height: 85%;
+  height: 60%;
   font-size: 36px;
   overflow: hidden;
+}
+.event-description > * {
+  margin: 5% 0 5% 0;
+  text-decoration: none;
+  color: #000;
 }
 .location-info {
   justify-content: space-evenly;
@@ -262,6 +273,9 @@ a {
 .location-info > * , .map-info > *{
   border-radius: 16px;
   box-shadow: #222f3e38 0 0 6px;
+}
+.seating::before {
+  content: '';
 }
 
   /******************/
