@@ -6,4 +6,5 @@ function initApp() {
     searchInput: $('.search-input'),
     searchContainer: $('#search-result-container')
   });
+  application.addEventHandlers();
 }
