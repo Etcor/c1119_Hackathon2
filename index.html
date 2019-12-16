@@ -3,27 +3,39 @@
 <head>
   <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
   <script src="https://kit.fontawesome.com/48e2953c42.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link rel="stylesheet" href="assets\css\style.css">
   <title>HACKATHON</title>
 </head>
 <body>
-  <div id="app-container">
+  <div id="app-container" class="app-container-bg">
     <div id="app-header">
       <h1 id="title">Rained Out</h1>
+      <i class="fas fa-home fa-4x home-btn"></i>
+      <i class="fas fa-power-off fa-4x darkmode-btn"></i>
     </div>
     <div id="search-bar">
-      <input type="text" class="search-input" placeholder="Enter Your Event">
-      <button class="search-button"><i class="fas fa-arrow-right fa-2x"></i></button>
+      <input type="text" spellcheck="false" class="search-input" placeholder="Enter Your Event">
+      <button class="search-button"><i class="fas fa-arrow-right fa-3x"></i></button>
     </div>
-    <div id="search-result-container">
+    <div id="search-result-container" class="search-result-container">
       <div class="landing-page">
         <div class="img-container">
           <div class="landing-page-title">Weather can ruin the fun</div>
-          <div class="sad-man"></div>
-          <div class="landing-page-purpose">let us help</div>
+          <div class="slide-show-container">
+            <div class="slide-show-img"></div>
+            <div class="slide-show-img"></div>
+            <div class="slide-show-img"></div>
+            <div class="slide-show-img"></div>
+          </div>
+          <div class="landing-page-purpose">Allow us to help!</div>
         </div>
         <div class="about-us-container">
-          <div class="about-us">Search realtime weather, directions, and ticket buying options to popular events, so you can plan ahead and be prepared in case of inclement weather!</div>
+          <div class="about-us">Search realtime weather, directions, and ticket buying options to popular events, so you can plan ahead and be prepared for inclement weather!</div>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-1">"This app changed my life, I would be lost without it!" - (definitely not a paid review)</div>
+          <div class="testimonial-2">"Rained Out reinforced that public API's can be difficult to work with"</div>
         </div>
       </div>
     </div>
@@ -34,10 +46,10 @@
       <div></div>
     </div>
   </div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ"></script>
+<script src="assets\js\map.js"></script>
+<script src="assets\js\weather.js"></script>
+<script src="assets\js\display_result.js"></script>
+<script src="assets\js\main.js"></script>
 </body>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgx2H6A2p6G-17WuFQ9s0UPutBhqWtxeQ"></script>
-  <script src="assets\js\map.js"></script>
-  <script src="assets\js\weather.js"></script>
-  <script src="assets\js\display_result.js"></script>
-  <script src="assets\js\main.js"></script>
 </html>
