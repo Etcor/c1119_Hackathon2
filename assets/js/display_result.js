@@ -168,7 +168,6 @@ class Display_result {
     let map = new Event_Map(latitude, longitude, index, mapParent, 16);
     let weather = new Event_Weather_Current(latitude, longitude, weatherParent, index);
     map.render();
-    weather.render();
     this.getCurrentWeatherData(weather, index);
   }
 
@@ -178,27 +177,15 @@ class Display_result {
       dataType: 'json',
       url: "http://api.openweathermap.org/data/2.5/weather?lat=" + weather.weatherData.lat + "&lon=" + weather.weatherData.lng + "&appid=" + key,
       method: 'GET',
-      success: response => this.processWeatherData(response, weather, index),
+      success: response => this.processWeatherData(weather, response),
       error: this.processWeatherDataError
     }
     $.ajax(ajaxConfigObject);
   }
 
-  processWeatherData(response, weather, index) {
-    var currentLocationName = response.name;
-    var currentTemp = response.main.temp;
-    var currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
-    var currentWeatherIcon = response.weather[0].icon + "@2x.png";
-    var currentWeatherDescription = response.weather[0].description;
-    if (currentTempFahr > 89) {
-      $(".weather-temp-" + index).parent().parent().addClass("hot-temp");
-    } else if (currentTempFahr < 55) {
-      $(".weather-temp-" + index).parent().parent().addClass("cold-temp");
-    }
-    $(".weather-title-" + index).text(currentLocationName);
-    $(".weather-temp-" + index).text(currentTempFahr).append($("<span>").html("&#8457"));
-    $(".weather-icon-" + index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
-    $(".weather-description-" + index).text(currentWeatherDescription);
+  processWeatherData(weather, response) {
+    weather.addResponseData(response);
+    weather.render();
   }
 
   processWeatherDataError(response) {

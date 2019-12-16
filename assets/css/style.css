@@ -326,12 +326,9 @@ button, .home-btn, .darkmode-btn {
   background: #f2d56d;
   color: #000 !important;
 }
-h1.weather-title {
+h1.weather-location {
   text-align: center;
   font-size: 3rem;
-}
-h2.weather-location-name {
-  font-size: 2.5rem;
 }
 .temp-and-icon-current {
   display: flex;

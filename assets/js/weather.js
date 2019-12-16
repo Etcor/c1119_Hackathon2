@@ -8,8 +8,7 @@ class Event_Weather_Current {
     };
     this.parentElem = $(parentElem);
     this.domElements = {
-      title: null,
-      name: null,
+      location_name: null,
       tempIconContainer: null,
       temp: null,
       icon: null,
@@ -18,20 +17,42 @@ class Event_Weather_Current {
     this.render = this.render.bind(this);
   }
 
+  addResponseData(response) {
+    this.weatherData.responseData = response;
+  }
+
   render() {
-    this.domElements.title = $("<h1>").addClass("weather-title weather-title-"+this.weatherData.index).text("Current Weather");
-    this.domElements.name = $("<h2>").addClass("weather-location-name weather-name-" + this.weatherData.index);
-    this.domElements.tempIconContainer = $("<div>").addClass("temp-and-icon-current weather-temp-and-icon-" + this.weatherData.index);
-    this.domElements.temp = $("<div>").addClass("temp-current weather-temp-" + this.weatherData.index);
-    this.domElements.icon = $("<img>").addClass("icon-current weather-icon-" + this.weatherData.index);
-    this.domElements.description = $("<h3>").addClass("weather-description weather-description-" + this.weatherData.index);
+    //Data from API Request
+    let currentLocationName = this.weatherData.responseData.name;
+    let currentTemp = this.weatherData.responseData.main.temp;
+    let currentTempFahr = (currentTemp * (9 / 5) - 459.67).toFixed(0);
+    let currentWeatherIcon = this.weatherData.responseData.weather[0].icon + "@2x.png";
+    let currentWeatherDescription = this.weatherData.responseData.weather[0].description;
+    let index = this.weatherData.index;
+    //Render Elements
+    this.domElements.location_name = $("<h1>").addClass("weather-location weather-location-" + index).text(currentLocationName);
+    this.domElements.tempIconContainer = $("<div>").addClass("temp-and-icon-current weather-temp-and-icon-" + index);
+    this.domElements.temp = $("<div>").addClass("temp-current weather-temp-" + index).text(currentTempFahr).append($("<span>").html("&#8457"));
+    this.domElements.icon = $("<img>").addClass("icon-current weather-icon-" + index).attr("src", "http://openweathermap.org/img/wn/" + currentWeatherIcon);
+    this.domElements.description = $("<h3>").addClass("weather-description weather-description-" + index).text(currentWeatherDescription);
     this.parentElem.append(
-      this.domElements.title,
-      this.domElements.name,
+      this.domElements.location_name,
       this.domElements.tempIconContainer.append(
         this.domElements.temp,
         this.domElements.icon),
       this.domElements.description);
+
+    if (currentTempFahr > 89) {
+      $(".weather-temp-" + index).parent().parent().addClass("hot-temp");
+    } else if (currentTempFahr < 55) {
+      $(".weather-temp-" + index).parent().parent().addClass("cold-temp");
+    }
   }
+
+  // whichWeatherSwitch() {
+  //   switch(weather) {
+  //     case
+  //   }
+  // }
 
 }
